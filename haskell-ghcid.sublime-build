@@ -1,0 +1,6 @@
+{
+  "working_dir": "${project_path}",
+  "cmd": ["sleep 0.5; ~/bin/ghc-output-joinlines.py < ghcid.txt"],
+  "shell": true,
+  "file_regex": "(\\S*):(\\d+):(\\d+): (.*)",
+}
