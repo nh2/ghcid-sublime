@@ -2,5 +2,21 @@
   "working_dir": "${project_path}",
   "cmd": ["sleep 0.5; ~/bin/ghc-output-joinlines.py < ghcid.txt"],
   "shell": true,
-  "file_regex": "(\\S*):(\\d+):(\\d+): (.*)",
+  // GHC output looks like:
+  //     /path/to/File.hs:94:19: error: • Couldn't match expected type
+  // and new in GHC >= 8.6 are the following two looks:
+  //     /path/to/File.hs:94:19-31: error: • Couldn't match expected type
+  //     /path/to/File.hs:(159,35)-(175,51): error: • Couldn't match expected type
+  // We use a non-capture group for end-column (optional, because it exists only in GHC >= 8.6):
+  //     (?:-\\d+)?
+  // Similarly, we make all the range-stuff optional.
+  // This isn't trivial, because a given capture group (e.g. field 2)
+  // must only appear once in the whole regex; it cannot appear multiple
+  // times across `|` alternatives.
+  //
+  // In any case, the below is incromprehensible unless you use a tool like
+  // https://regex101.com.
+  // Simply copy-paste the regex in there, replace all `\\` by `\`, and
+  // put the above examples in to see how it works.
+  "file_regex": "(\\S*):\\(?(\\d+)(?:,|:)(\\d+)(?:\\)-\\(\\d+,\\d+\\))?(?:-\\d+)?: (.*)",
 }
